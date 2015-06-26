@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="34775a33-41ff-4459-bd94-d73e34f0c8ad" solutionId="34775a33-41ff-4459-bd94-d73e34f0c8ad" resetWebServer="false" sharePointProductVersion="15.0" name="Ventigrate.Shared.OpenPDF" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="da85b7b8-b880-4a86-9d0b-0fec1760aeb8" />
+  </features>
+</package>

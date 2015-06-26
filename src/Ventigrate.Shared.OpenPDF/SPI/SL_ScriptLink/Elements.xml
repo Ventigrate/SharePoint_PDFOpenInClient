@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction
+    ScriptBlock="
+      SP.SOD.executeFunc('callout.js', 'Callout', function () {
+      
+        if (typeof(SPClientTemplates) === 'undefined' || SPClientTemplates === null) {
+            return;
+        }
+        
+        var itemCtx = {};
+        itemCtx.Templates = {};
+        itemCtx.BaseViewID = 'Callout';
+        // Define the list template type
+        itemCtx.ListTemplateType = 101;
+        itemCtx.Templates.Footer = function (itemCtx) {
+            // context, custom action function, show the ECB menu (boolean)
+            return CalloutRenderFooterTemplate(itemCtx, AddCustomAction, true);
+        };
+        
+        SPClientTemplates.TemplateManager.RegisterTemplateOverrides(itemCtx);
+      });
+
+      function AddCustomAction(renderCtx, calloutActionMenu) {
+          // Show the default document library actions
+          CalloutOnPostRenderTemplate(renderCtx, calloutActionMenu);
+
+          // Custom action
+          if (typeof renderCtx !== 'undefined') {
+              if (renderCtx.CurrentItem.FileRef.toLowerCase().indexOf('.pdf') > 0) {
+                  calloutActionMenu.addAction(new CalloutAction({
+                      text: 'Open in client',
+                      tooltip: 'Open in client',
+                      onClickCallback: function () {
+                          var fRet = true;
+                          var stsOpen = null;
+                          
+                          var itemUrl = location.protocol + '//' + location.hostname + renderCtx.CurrentItem.FileRef;
+
+                          if (Boolean(window.ActiveXObject)) {
+                              try {
+                                  stsOpen = new ActiveXObject('PdfFile.OpenDocuments');
+                                  fRet = typeof stsOpen.ViewDocument2 !== 'undefined' &amp;&amp; stsOpen.ViewDocument2(window, itemUrl, '');
+                              }
+                              catch (e) {
+                                  fRet = false;
+                                  window.location = itemUrl;
+                              }
+                          }
+                          return fRet;
+                      }
+                  }));
+              }
+          }
+
+          // Show the follow action
+          calloutActionMenu.addAction(new CalloutAction({
+              text: Strings.STS.L_CalloutFollowAction,
+              tooltip: Strings.STS.L_CalloutFollowAction_Tooltip,
+              onClickCallback: function (calloutActionClickEvent, calloutAction) {
+                  var callout = GetCalloutFromRenderCtx(renderCtx);
+                  if (!(typeof (callout) === 'undefined' || callout === null))
+                      callout.close();
+                  SP.SOD.executeFunc('followingcommon.js', 'FollowSelectedDocument', function () { FollowSelectedDocument(renderCtx); });
+              }
+          }));
+      }"
+    Location="ScriptLink"
+    Sequence="10000"  />
+</Elements>
